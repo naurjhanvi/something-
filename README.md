@@ -1,67 +1,47 @@
-def is_safe(board, row, col):
-    """ Check if it's safe to place a queen at board[row][col] """
-    # Check column
-    for i in range(row):
-        if board[i][col] == 1:
-            return False
+import sys
 
-    # Check upper diagonal on left side
-    i, j = row, col
-    while i >= 0 and j >= 0:
-        if board[i][j] == 1:
-            return False
-        i -= 1
-        j -= 1
+def nearest_neighbor_tsp(distances):
+    num_cities = len(distances)
 
-    # Check upper diagonal on right side
-    i, j = row, col
-    while i >= 0 and j < len(board):
-        if board[i][j] == 1:
-            return False
-        i -= 1
-        j += 1
+    # Start from the first city (arbitrary choice)
+    tour = [0] # Store the tour as a list of city indices
+    visited = set([0]) # Track visited cities
 
-    return True
+    current_city = 0
+    total_distance = 0
 
-def solve_queens(board, row):
-    """ Recursively solve the 8-Queens Problem using backtracking """
-    n = len(board)
+    while len(visited) < num_cities:
+        nearest_city = None
+        min_distance = sys.maxsize
 
-    # Base case: If all queens are placed, return True
-    if row >= n:
-        return True
+        # Find the nearest unvisited city
+        for next_city in range(num_cities):
+            if next_city not in visited and distances[current_city][next_city] < min_distance:
+                nearest_city = next_city
+                min_distance = distances[current_city][next_city]
 
-    for col in range(n):
-        if is_safe(board, row, col):
-            board[row][col] = 1 # Place the queen
+        # Move to the nearest city
+        tour.append(nearest_city)
+        visited.add(nearest_city)
 
-            # Recur to place the rest of the queens
-            if solve_queens(board, row + 1):
-                return True
+        total_distance += min_distance
+        current_city = nearest_city
 
-            # If placing queen at board[row][col] doesn't lead to a solution, backtrack
-            board[row][col] = 0 # Backtrack
+    # Complete the tour by returning to the starting city
+    tour.append(0)
+    total_distance += distances[current_city][0]
 
-    return False
+    return tour, total_distance
 
-def print_board(board):
-    """ Print the board configuration """
-    n = len(board)
-    for i in range(n):
-        for j in range(n):
-            print(board[i][j], end=" ")
-        print()
+# Example usage:
+if __name__ == "__main__":
+    # Example distance matrix (symmetric, square matrix)
+#   distances = [[0, 10, 15, 20], [10, 0, 35, 25], [15, 35, 0, 30], [20, 25, 30, 0]]
+    distances = [[ 0,  4,  8,  9, 12], [ 4,  0,  6,  8,  9], [ 8,  6,  0, 10, 11], [ 9,  8, 10,  0,  7], [12,  9, 
+11,  7,  0]]
+    # Run nearest neighbor TSP algorithm
+    tour, total_distance = nearest_neighbor_tsp(distances)
 
-def solve_8queens():
-    """ Solve the 8-Queens Problem and print the solution """
-    n = 8 # Size of the chessboard (8x8)
-    board = [[0] * n for _ in range(n)] # Initialize empty board
-
-    if solve_queens(board, 0):
-        print("Solution found:")
-        print_board(board)
-    else:
-        print("No solution exists.")
-
-# Call the function to solve the 8-Queens Problem
-solve_8queens()
+    # Print the tour and total distance
+    print("Nearest Neighbor TSP Tour:", tour)
+    print("Total Distance:", total_distance)
