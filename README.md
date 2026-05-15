@@ -1,59 +1,81 @@
 #include <stdio.h>
 
-int main() {
+void subset(int, int, int);
 
-    float weight[50], profit[50], ratio[50];
-    float Totalvalue = 0, temp, capacity;
-    int n, i, j;
+int x[10], w[10], d, count = 0;
 
-    printf("Enter the number of items: ");
+void main() {
+
+    int i, n, sum = 0;
+
+    printf("Enter the no. of elements: ");
+
     scanf("%d", &n);
 
-    for (i = 0; i < n; i++) {
-        printf("Enter Weight and Profit for item[%d]:\n", i);
-        scanf("%f %f", &weight[i], &profit[i]);
-    }
-
-    printf("Enter the capacity of knapsack:\n");
-    scanf("%f", &capacity);
+    printf("\nEnter the elements in ascending order:\n");
 
     for (i = 0; i < n; i++)
-        ratio[i] = profit[i] / weight[i];
 
-    for (i = 0; i < n; i++) {
-        for (j = i + 1; j < n; j++) {
-            if (ratio[i] < ratio[j]) {
+        scanf("%d", &w[i]);
 
-                temp = ratio[i];
-                ratio[i] = ratio[j];
-                ratio[j] = temp;
+    printf("\nEnter the sum: ");
 
-                temp = weight[i];
-                weight[i] = weight[j];
-                weight[j] = temp;
+    scanf("%d", &d);
 
-                temp = profit[i];
-                profit[i] = profit[j];
-                profit[j] = temp;
-            }
-        }
+    for (i = 0; i < n; i++)
+
+        sum = sum + w[i];
+
+    if (sum < d) {
+
+        printf("No solution\n");
+
+        return;
+
     }
 
-    printf("\nKnapsack problem using Greedy Algorithm:\n");
+    subset(0, 0, sum);
 
-    for (i = 0; i < n; i++) {
-        if (weight[i] > capacity)
-            break;
-        else {
-            Totalvalue += profit[i];
-            capacity -= weight[i];
-        }
+    if (count == 0) {
+
+        printf("No solution\n");
+
+        return;
+
     }
 
-    if (i < n)
-        Totalvalue += ratio[i] * capacity;
+}
 
-    printf("\nThe maximum value is: %f\n", Totalvalue);
+void subset(int cs, int k, int r) {
 
-    return 0;
+    int i;
+
+    x[k] = 1;
+
+    if (cs + w[k] == d) {
+
+        printf("\nSubset %d:\n", ++count);
+
+        for (i = 0; i <= k; i++)
+
+            if (x[i] == 1)
+
+                printf("%d\t", w[i]);
+
+    }
+
+    else if (cs + w[k] + w[k + 1] <= d) {
+
+        subset(cs + w[k], k + 1, r - w[k]);
+
+    }
+
+    if (cs + r - w[k] >= d && cs + w[k] <= d) {
+
+        x[k] = 0;
+
+        subset(cs, k + 1, r - w[k]);
+
+    }
+
 }
