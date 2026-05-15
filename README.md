@@ -1,47 +1,59 @@
-import sys
+#include <stdio.h>
 
-def nearest_neighbor_tsp(distances):
-    num_cities = len(distances)
+int main() {
 
-    # Start from the first city (arbitrary choice)
-    tour = [0] # Store the tour as a list of city indices
-    visited = set([0]) # Track visited cities
+    float weight[50], profit[50], ratio[50];
+    float Totalvalue = 0, temp, capacity;
+    int n, i, j;
 
-    current_city = 0
-    total_distance = 0
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
 
-    while len(visited) < num_cities:
-        nearest_city = None
-        min_distance = sys.maxsize
+    for (i = 0; i < n; i++) {
+        printf("Enter Weight and Profit for item[%d]:\n", i);
+        scanf("%f %f", &weight[i], &profit[i]);
+    }
 
-        # Find the nearest unvisited city
-        for next_city in range(num_cities):
-            if next_city not in visited and distances[current_city][next_city] < min_distance:
-                nearest_city = next_city
-                min_distance = distances[current_city][next_city]
+    printf("Enter the capacity of knapsack:\n");
+    scanf("%f", &capacity);
 
-        # Move to the nearest city
-        tour.append(nearest_city)
-        visited.add(nearest_city)
+    for (i = 0; i < n; i++)
+        ratio[i] = profit[i] / weight[i];
 
-        total_distance += min_distance
-        current_city = nearest_city
+    for (i = 0; i < n; i++) {
+        for (j = i + 1; j < n; j++) {
+            if (ratio[i] < ratio[j]) {
 
-    # Complete the tour by returning to the starting city
-    tour.append(0)
-    total_distance += distances[current_city][0]
+                temp = ratio[i];
+                ratio[i] = ratio[j];
+                ratio[j] = temp;
 
-    return tour, total_distance
+                temp = weight[i];
+                weight[i] = weight[j];
+                weight[j] = temp;
 
-# Example usage:
-if __name__ == "__main__":
-    # Example distance matrix (symmetric, square matrix)
-#   distances = [[0, 10, 15, 20], [10, 0, 35, 25], [15, 35, 0, 30], [20, 25, 30, 0]]
-    distances = [[ 0,  4,  8,  9, 12], [ 4,  0,  6,  8,  9], [ 8,  6,  0, 10, 11], [ 9,  8, 10,  0,  7], [12,  9, 
-11,  7,  0]]
-    # Run nearest neighbor TSP algorithm
-    tour, total_distance = nearest_neighbor_tsp(distances)
+                temp = profit[i];
+                profit[i] = profit[j];
+                profit[j] = temp;
+            }
+        }
+    }
 
-    # Print the tour and total distance
-    print("Nearest Neighbor TSP Tour:", tour)
-    print("Total Distance:", total_distance)
+    printf("\nKnapsack problem using Greedy Algorithm:\n");
+
+    for (i = 0; i < n; i++) {
+        if (weight[i] > capacity)
+            break;
+        else {
+            Totalvalue += profit[i];
+            capacity -= weight[i];
+        }
+    }
+
+    if (i < n)
+        Totalvalue += ratio[i] * capacity;
+
+    printf("\nThe maximum value is: %f\n", Totalvalue);
+
+    return 0;
+}
